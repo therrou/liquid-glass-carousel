@@ -155,29 +155,34 @@
 
 .counter-num {
   display: flex;
-  align-items: baseline;
-  gap: 2px;
+  align-items: flex-end;
+  gap: 4px;
 }
 
 .counter-mask {
   position: relative;
-  height: 72px;
-  width: 1.3em;
+  height: 1.45em;
+  width: 1.4em;
   overflow: hidden;
   font-size: 72px;
+  /* Soft fade at top & bottom so numbers ease in/out instead of hard-clipping */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 78%, transparent 100%);
+          mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 78%, transparent 100%);
 }
 
 .counter-current {
   position: absolute;
   inset: 0;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-serif);
   font-size: 72px;
   font-weight: 300;
   color: var(--text);
   line-height: 1;
   letter-spacing: -0.02em;
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 .counter-total {
@@ -185,7 +190,7 @@
   color: var(--text-dim);
   font-weight: 300;
   letter-spacing: 0.05em;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 /* ── Archive label ── */
@@ -219,19 +224,4 @@
   color: var(--text);
   line-height: 0.92;
   letter-spacing: -0.01em;
-}
-
-/* ── Custom cursor ── */
-.custom-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: rgba(232, 213, 183, 0.7);
-  pointer-events: none;
-  z-index: 9999;
-  transition: transform 0.08s ease-out;
-  mix-blend-mode: difference;
 }

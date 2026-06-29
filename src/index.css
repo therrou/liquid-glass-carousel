@@ -17,5 +17,4 @@ html, body, #root {
   color: var(--text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  cursor: none;
 }

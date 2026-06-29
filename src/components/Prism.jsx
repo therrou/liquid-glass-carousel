@@ -133,10 +133,13 @@ export default function Prism({ config }) {
       useStore.getState().setPrismEntered(true)
     }
 
-    const targetX = cursor.y * cursorInfluence
-    const targetZ = -cursor.x * cursorInfluence * 0.5
-    tiltRef.current.rotation.x += (targetX - tiltRef.current.rotation.x) * 0.06
-    tiltRef.current.rotation.z += (targetZ - tiltRef.current.rotation.z) * 0.06
+    // Front face turns to face the cursor: yaw (Y) for horizontal, pitch (X)
+    // for vertical, no roll (Z).
+    const targetX = -cursor.y * cursorInfluence
+    const targetY = cursor.x * cursorInfluence
+    tiltRef.current.rotation.x += (targetX - tiltRef.current.rotation.x) * 0.08
+    tiltRef.current.rotation.y += (targetY - tiltRef.current.rotation.y) * 0.08
+    tiltRef.current.rotation.z += (0 - tiltRef.current.rotation.z) * 0.08
   })
 
   return (

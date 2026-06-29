@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useControls, button, Leva } from 'leva'
 import { motion, AnimatePresence } from 'framer-motion'
 import Scene from './components/Scene'
@@ -35,7 +35,7 @@ export default function App() {
     edge: { value: 0.05, min: 0, max: 0.35, step: 0.005, label: 'Edge (Bevel)' },
     depth: { value: 0.01, min: 0, max: 2, step: 0.05, label: 'Thickness' },
     prismScale: { value: 1.35, min: 0.3, max: 2.5, step: 0.05, label: 'Scale' },
-    cursorInfluence: { value: 0.06, min: 0, max: 0.4, step: 0.01, label: 'Cursor Tilt' },
+    cursorInfluence: { value: 0.3, min: 0, max: 0.4, step: 0.01, label: 'Cursor Tilt' },
     entryDuration: { value: 0.8, min: 0.3, max: 5, step: 0.1, label: 'Entry Duration' },
   })
 
@@ -76,12 +76,20 @@ export default function App() {
   useScroll(1.2, IMAGE_W)
 
   const currentIndex = useStore((s) => s.currentIndex)
+  const direction = useStore((s) => s.direction)
 
   const delay = (n) => ({ initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.7, delay: n } })
 
+  // Number slides up when advancing, down when going back.
+  const numVariants = {
+    enter: (d) => ({ y: d >= 0 ? '110%' : '-110%', opacity: 0 }),
+    center: { y: '0%', opacity: 1 },
+    exit: (d) => ({ y: d >= 0 ? '-110%' : '110%', opacity: 0 }),
+  }
+
   return (
     <div className="app">
-      <Leva collapsed titleBar={{ title: 'Controls' }} />
+      <Leva collapsed titleBar={{ title: 'Controls' }} hidden={!DEBUG} />
 
       {/* R3F: 3D carousel images + glass prism in one scene for real refraction */}
       <Scene prismConfig={prismConfig} carouselConfig={{ ...carouselCtrl, revealNonce }} />
@@ -102,28 +110,30 @@ export default function App() {
 
       <motion.div className="counter-area" {...delay(2.1)}>
         <div className="counter-thumb">
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence>
             <motion.img
               key={SEEDS[currentIndex]}
               src={`https://picsum.photos/seed/${SEEDS[currentIndex]}/120/90`}
               alt="current slide"
-              initial={{ opacity: 0, scale: 1.15 }}
+              initial={{ opacity: 0, scale: 1.08 }}
               animate={{ opacity: 0.85, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.55, ease: EASE }}
+              exit={{ opacity: 0, scale: 1.04 }}
+              transition={{ duration: 0.7, ease: EASE }}
             />
           </AnimatePresence>
         </div>
         <div className="counter-num">
           <div className="counter-mask">
-            <AnimatePresence mode="popLayout">
+            <AnimatePresence mode="popLayout" custom={direction} initial={false}>
               <motion.span
                 key={currentIndex}
                 className="counter-current"
-                initial={{ y: '105%', opacity: 0 }}
-                animate={{ y: '0%', opacity: 1 }}
-                exit={{ y: '-105%', opacity: 0 }}
-                transition={{ duration: 0.5, ease: EASE }}
+                custom={direction}
+                variants={numVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.6, ease: EASE }}
               >
                 {String(currentIndex + 1).padStart(2, '0')}
               </motion.span>
@@ -142,24 +152,6 @@ export default function App() {
           Silent<br />Frequency
         </h1>
       </motion.footer> */}
-
-      <Cursor />
     </div>
   )
-}
-
-function Cursor() {
-  const ref = useRef(null)
-
-  useEffect(() => {
-    const onMove = (e) => {
-      if (ref.current) {
-        ref.current.style.transform = `translate(${e.clientX - 6}px, ${e.clientY - 6}px)`
-      }
-    }
-    window.addEventListener('mousemove', onMove)
-    return () => window.removeEventListener('mousemove', onMove)
-  }, [])
-
-  return <div ref={ref} className="custom-cursor" />
 }

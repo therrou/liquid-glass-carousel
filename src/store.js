@@ -13,5 +13,8 @@ export const useStore = create((set, get) => ({
   setPrismEntered: (v) => set({ prismEntered: v }),
   currentIndex: 0,
   setCurrentIndex: (i) => set({ currentIndex: i }),
+  // +1 when advancing, -1 when going back → drives the counter slide direction.
+  direction: 1,
+  setDirection: (d) => set({ direction: d }),
   totalImages: 10,
 }))
